@@ -81,6 +81,13 @@ Here’s a screenshot of the user interface:
 
 ![UI Screenshot](UI.png)
 
+## Demo Video
+
+Watch the demo of the application:
+
+[![Demo Video](thumbnail.png)](https://www.youtube.com/watch?v=eVr-gVun1pM)
+
+
 ## Troubleshooting
 
 - If you encounter any issues, ensure both the backend and frontend servers are running correctly.
