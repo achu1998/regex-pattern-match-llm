@@ -17,6 +17,7 @@ import re
 
 # Store JSON data
 data_store = []
+enable_verfiy = False
 
 @api_view(['POST'])
 def upload_excel(request):
@@ -78,27 +79,29 @@ def generate_regex(request):
         retry = 1
         replacement_word = extract_context_replacement(user_prompt)
         print(f"Generated Replacement word: {replacement_word}")
-        result = verifyReplace(user_prompt, replacement_word)
-        while ("No" in result or "Yes" not in result) :
-            if retry == 4: return JsonResponse({"error": "Invalid response"}, status=400)
-            print("Retry for Replacement word - ", retry, " , Incorrect Replace word!")
-            retry += 1
-            replacement_word = extract_context_replacement(user_prompt)
-            print(f"Generated Replacement word: {replacement_word}")
+        if enable_verfiy:
             result = verifyReplace(user_prompt, replacement_word)
+            while ("No" in result or "Yes" not in result) :
+                if retry == 4: return JsonResponse({"error": "Invalid response"}, status=400)
+                print("Retry for Replacement word - ", retry, " , Incorrect Replace word!")
+                retry += 1
+                replacement_word = extract_context_replacement(user_prompt)
+                print(f"Generated Replacement word: {replacement_word}")
+                result = verifyReplace(user_prompt, replacement_word)
         
         # Get regex output
         retry = 1
         regex_pattern_full = generate_regex_from_desc(user_prompt)
         print(f"Generated Regex: {regex_pattern_full}")
-        result = verifyRegex(user_prompt, regex_pattern_full)
-        while ("No" in result or "Yes" not in result) :
-            if retry == 4: return JsonResponse({"error": "Invalid response"}, status=400)
-            print("Retry for Regex - ", retry, " , Incorrect Regex!")
-            retry += 1
-            regex_pattern_full = generate_regex_from_desc(user_prompt)
-            print(f"Generated Regex: {regex_pattern_full}")
+        if enable_verfiy:
             result = verifyRegex(user_prompt, regex_pattern_full)
+            while ("No" in result or "Yes" not in result) :
+                if retry == 4: return JsonResponse({"error": "Invalid response"}, status=400)
+                print("Retry for Regex - ", retry, " , Incorrect Regex!")
+                retry += 1
+                regex_pattern_full = generate_regex_from_desc(user_prompt)
+                print(f"Generated Regex: {regex_pattern_full}")
+                result = verifyRegex(user_prompt, regex_pattern_full)
 
         return JsonResponse({"regex_pattern": regex_pattern_full, "replace": replacement_word})
 
@@ -112,8 +115,7 @@ generator = pipeline("text2text-generation", model="google/flan-t5-large")
 
 def extract_context_replacement(description):
     # Prompt that explicitly asks for the replacement word
-    prompt = f"question: Which is the Replacement word? Replacement word must be a single word strictly! Give single correct word without changing spelling! Do not return entire sentence or empty! context: {description}"   
-    
+    prompt = f"question: Which is the Replacement word from the context? Replacement word must be a single word strictly! Replacement word replaces the find! context: {description}"   
 
     # Generate response
     response = generator(prompt, max_length=100, num_return_sequences=1)
@@ -123,20 +125,18 @@ def extract_context_replacement(description):
     
     return replacement_word
 
-def generate_regex_from_desc(description, model="codellama"):
+def generate_regex_from_desc(description, model="mistral"):
     print("Waiting for Regex Response...")
+    
     prompt = (
-        f"I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves."
-        f"My first prompt is to generate a regular expression that strictly matches description."
-        f"Description: {description}"
-        f"An important rule is that names will have first and last name! Example : John Doe. So regex should consider John as first name and Doe as last name!"
-        f"Make sure all the cases are covered! Remove case-insensitive flag (?i). Regex are case sensitive"
+        f"I want you to act as a regex generator. Your role is to convert the following natural language query to a regular expression with valid word boundary '\b' (regex):{description}"
+        f"You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves."
+        f"Provide only the regex pattern as your response, without any explanation or additional text. Regex should be strictly valid without double backslashes or domain matching issues!"
         f"Return the response strictly in JSON format as: {{'regex_pattern': '<your_regex>'}} and no other explanation in the response."
     )
     
     response = ollama.chat(model=model, messages=[
-        {"role": "system", "content": prompt},
-        # {"role": "user", "content": prompt}
+        {"role": "user", "content": prompt}
     ])
 
     try:
@@ -150,43 +150,36 @@ def generate_regex_from_desc(description, model="codellama"):
     
     
 
-def verifyRegex(description, regex,  model="deepseek-r1:1.5b"):
+def verifyRegex(description, regex,  model="mistral"):
     print("Verifying Regex Response...")
     prompt = (
-        f"You are an regex verifier. Check whether the regex {regex} strictly matches the find part of description: {description} and verify it. (?i) should not be present in regex. Case-sensitive."
-        f"An important rule is that names will have first and last name! Example : John Doe. So regex should consider John as first name and Doe as last name!"
-        f"Return strictly as 'Yes' or 'No'"      
+        f"I want you to act as a regex verifier. Your role is to check whether the regex {regex} strictly matches the find part of description: {description} and verify it."
+        f"You should only return strictly as 'Yes' or 'No'. No other explanation!"  
+        f"Do not write explanations or examples of how the regular expressions work; simply provide only 'Yes' if regex matches, 'No' if it doesn't match."    
     )
     
     response = ollama.chat(model=model, messages=[
-        {"role": "system", "content": prompt},
+        {"role": "user", "content": prompt},
     ])
     
     # Generate response
-    ans = response["message"]["content"]
-    if "</think>" in ans:
-        ans = ans.split("</think>")[-1].strip()
+    ans = response["message"]["content"].strip()
     print("Regex Verification success - ", ans)   
     return ans
 
-def verifyReplace(description, replace,  model="deepseek-r1:1.5b"):
+def verifyReplace(description, replace,  model="mistral"):
     print("Verifying Replacement Response...")
     prompt = (
-        f"You are an context verifier. Check whether the replacement word {replace} matches the replace part of description: {description} and verify it. Replacement word must be a single word strictly! Case-sensitive. No special characters or spaces!"
-        f"Return strictly as 'Yes' or 'No'"      
+        f"I want you to act as a context verifier. Your role is to check whether the replacement word {replace} matches the replace part of description: {description} and verify it. You should remember that replacement word must be a single word strictly."
+        f"You should only return strictly as 'Yes' or 'No'. No other explanation!" 
+        f"Do not write explanations or examples; simply provide only 'Yes' if replacement word matches, 'No' if it doesn't match."  
     )
     
     response = ollama.chat(model=model, messages=[
-        {"role": "system", "content": prompt},
+        {"role": "user", "content": prompt},
     ])
     
     # Generate response
-    ans = response["message"]["content"]
-    if "</think>" in ans:
-        ans = ans.split("</think>")[-1].strip()
+    ans = response["message"]["content"].strip()
     print("Replace Verification success - ", ans)   
     return ans
-
-# description = "Find hex color ending with '00' in the HEX column and replace them with 'REDACTED'."
-# regex = "{'regex_pattern':'#[a-zA-Z0-9]{6}00'}"
-# verify(description, regex)
