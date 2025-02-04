@@ -29,13 +29,13 @@ function App() {
         }
     };
 
-    const fetchData = async () => {
-        setRegex("");
-        setReplace("");
-        setIsTextVisible(false);
-        const res = await axios.get('http://127.0.0.1:8000/data/');
-        setData(res.data.data);
-    };
+    // const fetchData = async () => {
+    //     setRegex("");
+    //     setReplace("");
+    //     setIsTextVisible(false);
+    //     const res = await axios.get('http://127.0.0.1:8000/data/');
+    //     setData(res.data.data);
+    // };
 
     const handleGenerateRegex = async () => {
         setLoading(true);
@@ -95,16 +95,22 @@ function App() {
             <div className="mb-4">
                 <button 
                     onClick={uploadFile} 
-                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                    className="ml-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
                 >
                     Upload
                 </button>
-                <button 
+                {/* <button 
+                    onClick={uploadFile} 
+                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                >
+                    Upload
+                </button> */}
+                {/* <button 
                     onClick={fetchData} 
                     className="ml-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
                 >
                     Fetch Stored Data
-                </button>
+                </button> */}
             </div>
 
             <div className="mb-4">
