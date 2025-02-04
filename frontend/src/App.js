@@ -51,6 +51,7 @@ function App() {
             console.log(pattern);
             pattern = pattern.replaceAll("{'regex_pattern': '", "");
             pattern = pattern.replaceAll("{'regex_pattern':'", "");
+            pattern = pattern.replaceAll(/\\\\/g, "\\");
             pattern = pattern.replaceAll("'}", "");
             pattern = pattern.replaceAll("'", "");
             setRegex(pattern);
