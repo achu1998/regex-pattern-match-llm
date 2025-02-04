@@ -45,6 +45,14 @@ Follow these steps to set up the project:
 
    **Note**: Use `python3` instead of `python` if that's how it's installed on your system.
 
+- **Based on the LLM you are using -** 
+
+    ```bash
+     ollama pull deepseek-r1
+     ollama pull deepseek-r1:1.5b
+     ollama pull codellama
+     ```
+
 ## User Instructions for Upload and Regex Generation
 
 ### 1. **Upload Excel or CSV File**:
@@ -60,17 +68,17 @@ Here are some example instructions:
 
 - **Find email addresses ending with 'com'** in the **Email** column and replace them with `'REDACTED'`.
   
-- **Find names starting with the character 'J'** in the **First Name** column and replace them with `'REDACTED'`.
+- **Find names starting with the character 'J'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
-- **Find names ending with 'Brown'** as the **Last Name** in the **Name** column and replace them with `'REDACTED'`.
+- **Find names with 'Brown'** as the **Last Name** in the **Name** column and replace them with `'REDACTED'`.
 
-- **Find names starting with 'A'** in the **First Name** column and replace them with `'REDACTED'`.
+- **Find names starting with 'A'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
-- **Find names ending with 'e'** in the **Name** column and replace them with `'REDACTED'`.
+- **Find names ending with character 'e'** in the **Last Name** in the **Name** column and replace them with `'REDACTED'`.
 
-- **Find names starting with 'Jane'** in the **Name** column and replace them with `'REDACTED'`.
+- **Find names starting with 'Jane'** as the **First Name** in the **Name** column and replace them with `'REDACTED'`.
 
-- **Find all email addresses** in the **Email** column and replace them with `'REDACTED'`.
+- **Find email addresses** in the **Email** column and replace them with `'REDACTED'`.
 
 ### 3. **UI Display**:
 Once an instruction is entered, the generated regex pattern and replacement value will be displayed on the UI, showing the user what would be replaced in the file.
