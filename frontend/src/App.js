@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function App() {
+
+    // Initialize all the states
     const [file, setFile] = useState(null);
     const [data, setData] = useState([]);
     const [userPrompt, setUserPrompt] = useState("");
@@ -13,81 +15,127 @@ function App() {
     const handleFileChange = (e) => setFile(e.target.files[0]);
 
     const uploadFile = async () => {
+        if (!file) {
+            console.error("No file selected.");
+            return;
+        }
+    
         const formData = new FormData();
-        formData.append('file', file);
-
+        formData.append("file", file);
+    
         try {
+            // Reset state before making request
             setRegex("");
             setReplace("");
             setIsTextVisible(false);
-            const res = await axios.post('http://127.0.0.1:8000/upload/', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+    
+            // Send file to backend
+            const res = await axios.post("http://127.0.0.1:8000/upload/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
-
-            if (typeof(res.data.data) != "undefined") {
-                setData(res.data.data);
-            }
-            else {
-                let jsonString = res.data;
-                let fixedJsonString = jsonString.replace(/NaN/g, "null");
+    
+            let responseData = res.data;
+            
+            if (typeof(responseData.data) != "undefined") {
+                setData(responseData.data);
+            } else {
                 try {
+                    // Handle possible NaN values safely
+                    let fixedJsonString = responseData.replace(/NaN/g, "null");
                     let jsonData = JSON.parse(fixedJsonString);
                     setData(jsonData.data);
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                 }
             }
-            
         } catch (error) {
-            console.error(error);
+            console.error("Upload failed:", error.response?.data || error.message);
         }
     };
+    
 
     const handleGenerateRegex = async () => {
-        setLoading(true);
-        const response = await fetch("http://127.0.0.1:8000/generate_regex/", {
-          method: "POST",
-          headers: { "Content-Type": "text" },
-          body: JSON.stringify({ user_prompt: userPrompt }),
-        });
-    
-        const res = await response.json();
-        if(res.regex_pattern && res.replace) {
-            var pattern = res.regex_pattern;
-            console.log(pattern);
-            pattern = pattern.replaceAll("{'regex_pattern': '", "");
-            pattern = pattern.replaceAll("{'regex_pattern':'", "");
-            pattern = pattern.replaceAll(/\\\\/g, "\\");
-            pattern = pattern.replaceAll("'}", "");
-            pattern = pattern.replaceAll("'", "");
-            setRegex(pattern);
-            setReplace(res.replace);
-            setIsTextVisible(true);
-            setLoading(false);
-            const updatedJson = replaceMatchingValues(data, pattern, res.replace);
-            setData(updatedJson);
+        if (!userPrompt.trim()) {
+            console.error("User prompt is empty.");
+            return;
         }
-      };
+    
+        setLoading(true);
+        
+        try {
+            const response = await fetch("http://127.0.0.1:8000/generate_regex/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_prompt: userPrompt }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.status} ${response.statusText}`);
+            }
+    
+            const res = await response.json();
+    
+            if (res.regex_pattern && res.replace) {
+                let pattern = res.regex_pattern.trim();
+    
+                // Ensure regex is extracted properly
+                pattern = pattern.replaceAll("{'regex_pattern': '", "");
+                pattern = pattern.replaceAll("{'regex_pattern':'", "");
+                pattern = pattern.replaceAll(/\\\\/g, "\\");
+                pattern = pattern.replaceAll("'}", "");
+                pattern = pattern.replaceAll("'", "");
+                pattern = pattern.replaceAll('\b', '');
+    
+                console.log("Generated Regex:", pattern);
+    
+                setRegex(pattern);
+                setReplace(res.replace);
+                setIsTextVisible(true);
+    
+                // Update JSON data
+                const updatedJson = replaceMatchingValues(data, pattern, res.replace);
+                setData(updatedJson);
+            } else {
+                console.error("Invalid response format:", res);
+            }
+        } catch (error) {
+            console.error("Error generating regex:", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
-      function replaceMatchingValues(json, regexString, replacement) {
-        const regex = new RegExp(regexString);
-        function traverse(obj) {
-            if (typeof obj === "object" && obj !== null) {
-                for (let key in obj) {
-                    if (typeof obj[key] === "string" && regex.test(obj[key])) {
-                        console.log(obj[key]);
-                        obj[key] = replacement;
-                    } else if (typeof obj[key] === "object") {
-                        traverse(obj[key]); // Recursively traverse nested objects/arrays
+    function replaceMatchingValues(json, regexString, replacement) {
+        try {
+            // Ensure regex string has word boundaries and is global
+            const regex = new RegExp(`\\b${regexString}\\b`, "g");
+    
+            function traverse(obj) {
+                if (Array.isArray(obj)) {
+                    // Handle arrays properly
+                    return obj.map(item => traverse(item));
+                } else if (typeof obj === "object" && obj !== null) {
+                    for (let key in obj) {
+                        if (typeof obj[key] === "string" && regex.test(obj[key])) {
+                            obj[key] = replacement;
+                        } else if (typeof obj[key] === "object") {
+                            obj[key] = traverse(obj[key]); // Recursively traverse nested objects
+                        }
                     }
                 }
+                return obj;
             }
-        }
     
-        let clonedJson = JSON.parse(JSON.stringify(json)); // Clone to avoid modifying original object
-        traverse(clonedJson);
-        return clonedJson;
+            // Clone to avoid modifying original object
+            return traverse(JSON.parse(JSON.stringify(json)));
+    
+        } catch (error) {
+            console.error("Error in replaceMatchingValues:", error);
+            return json; // Return original JSON if there's an error
+        }
     }
+    
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
