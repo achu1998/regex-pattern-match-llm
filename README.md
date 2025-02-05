@@ -67,19 +67,19 @@ After uploading your file, you can try different instructions that target specif
 
 Here are some example instructions:
 
-- **Find email addresses ending with 'com'** in the **Email** column and replace them with `'REDACTED'`.
-  
 - **Find names starting with the character 'J'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
+- **Find email addresses** in the **Email** column and replace them with `'REDACTED'`.
+
 - **Find names where Last Name is 'Brown'** in the **Name** column and replace them with `'REDACTED'`.
+
+- **Find email addresses ending with '.org'** in the **Email** column and replace them with `'REDACTED'`.
 
 - **Find names starting with 'A'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
 - **Find names where Last Name ends with 'e'** in the **Name** column and replace them with `'REDACTED'`.
 
 - **Find names starting with 'Jane'** as the **First Name** in the **Name** column and replace them with `'REDACTED'`.
-
-- **Find email addresses** in the **Email** column and replace them with `'REDACTED'`.
 
 ### 3. **UI Display**:
 Once an instruction is entered, the generated regex pattern and replacement value will be displayed on the UI, showing the user what would be replaced in the file.
