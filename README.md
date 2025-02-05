@@ -9,6 +9,13 @@ Ensure that you have the following installed:
 - **Python** (use `python` or `python3` based on your installation)
 - **Node.js** and **npm**
 
+- **Based on the LLM you are using -** 
+
+    ```bash
+     ollama pull mistral
+     ```
+**Note**: I'm using `mistral` for **regex generation** and **verification** `google/flan-t5-large` for finding the **replacement word**.
+
 ## Setup Instructions
 
 Follow these steps to set up the project:
@@ -45,13 +52,7 @@ Follow these steps to set up the project:
 
    **Note**: Use `python3` instead of `python` if that's how it's installed on your system.
 
-- **Based on the LLM you are using -** 
-
-    ```bash
-     ollama pull deepseek-r1
-     ollama pull deepseek-r1:1.5b
-     ollama pull codellama
-     ```
+**Note**: Introduced a variable `enable_verfiy = False` in `regexapp\views.py` which helps in verifying the generated output. Set it to `True` if testing for verifying the generated output.   
 
 ## User Instructions for Upload and Regex Generation
 
@@ -70,11 +71,11 @@ Here are some example instructions:
   
 - **Find names starting with the character 'J'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
-- **Find names with 'Brown'** as the **Last Name** in the **Name** column and replace them with `'REDACTED'`.
+- **Find names where Last Name is 'Brown'** in the **Name** column and replace them with `'REDACTED'`.
 
 - **Find names starting with 'A'** in the **First Name** in the Name column and replace them with `'REDACTED'`.
 
-- **Find names ending with character 'e'** in the **Last Name** in the **Name** column and replace them with `'REDACTED'`.
+- **Find names where Last Name ends with 'e'** in the **Name** column and replace them with `'REDACTED'`.
 
 - **Find names starting with 'Jane'** as the **First Name** in the **Name** column and replace them with `'REDACTED'`.
 
@@ -82,6 +83,8 @@ Here are some example instructions:
 
 ### 3. **UI Display**:
 Once an instruction is entered, the generated regex pattern and replacement value will be displayed on the UI, showing the user what would be replaced in the file.
+
+### **You can use the SampleData.xlsx for testing!**
 
 ### UI Example:
 

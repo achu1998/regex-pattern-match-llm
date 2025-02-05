@@ -48,18 +48,6 @@ def upload_excel(request):
 
     default_storage.delete(file_path)
     return JsonResponse({'data': data_store})
-
-
-@api_view(['GET'])
-def get_stored_data(request):
-    return JsonResponse({'data': data_store})
-
-def is_valid_regex(pattern):
-    try:
-        re.compile(pattern)
-        return True
-    except re.error:
-        return False
     
 @csrf_exempt
 def generate_regex(request):
@@ -129,10 +117,10 @@ def generate_regex_from_desc(description, model="mistral"):
     print("Waiting for Regex Response...")
     
     prompt = (
-        f"I want you to act as a regex generator. Your role is to convert the following natural language query to a regular expression with valid word boundary '\b' (regex):{description}"
+        f"I want you to act as a regex generator. Your role is to convert the following natural language query to a regular expression with valid word boundary on both ends '\b <your_regex> \b' (regex):{description}"
         f"You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves."
         f"Provide only the regex pattern as your response, without any explanation or additional text. Regex should be strictly valid without double backslashes or domain matching issues!"
-        f"Return the response strictly in JSON format as: {{'regex_pattern': '<your_regex>'}} and no other explanation in the response."
+        f"Return the response strictly in JSON format as: {{'regex_pattern': '\b<your_regex>\b'}} and no other explanation in the response. Regex should have word boundary on both sides!"
     )
     
     response = ollama.chat(model=model, messages=[

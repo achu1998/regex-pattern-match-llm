@@ -23,19 +23,25 @@ function App() {
             const res = await axios.post('http://127.0.0.1:8000/upload/', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            setData(res.data.data);
+
+            if (typeof(res.data.data) != "undefined") {
+                setData(res.data.data);
+            }
+            else {
+                let jsonString = res.data;
+                let fixedJsonString = jsonString.replace(/NaN/g, "null");
+                try {
+                    let jsonData = JSON.parse(fixedJsonString);
+                    setData(jsonData.data);
+                } catch (error) {
+                    console.error("Error parsing JSON:", error);
+                }
+            }
+            
         } catch (error) {
             console.error(error);
         }
     };
-
-    // const fetchData = async () => {
-    //     setRegex("");
-    //     setReplace("");
-    //     setIsTextVisible(false);
-    //     const res = await axios.get('http://127.0.0.1:8000/data/');
-    //     setData(res.data.data);
-    // };
 
     const handleGenerateRegex = async () => {
         setLoading(true);
@@ -100,18 +106,6 @@ function App() {
                 >
                     Upload
                 </button>
-                {/* <button 
-                    onClick={uploadFile} 
-                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-                >
-                    Upload
-                </button> */}
-                {/* <button 
-                    onClick={fetchData} 
-                    className="ml-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
-                >
-                    Fetch Stored Data
-                </button> */}
             </div>
 
             <div className="mb-4">

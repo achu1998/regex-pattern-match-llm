@@ -16,10 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from regexapp.views import upload_excel, get_stored_data, generate_regex
+from regexapp.views import upload_excel, generate_regex
 
 urlpatterns = [
     path('upload/', upload_excel, name='upload_excel'),
-    path('data/', get_stored_data, name='get_stored_data'),
     path('generate_regex/', generate_regex, name='generate_regex'),
 ]
