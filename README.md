@@ -96,7 +96,7 @@ Here’s a screenshot of the user interface:
 
 Watch the demo of the application:
 
-[![Demo Video](thumbnail.png)](https://www.youtube.com/watch?v=eVr-gVun1pM)
+[![Demo Video](thumbnail.png)](https://youtu.be/wyuaafh-47E)
 
 
 ## Troubleshooting
