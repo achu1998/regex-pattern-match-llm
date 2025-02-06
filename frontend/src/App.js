@@ -180,7 +180,7 @@ function App() {
                 <b>Replacement Value: </b>{replace}
             </p>
 
-            <h3 className="text-xl font-semibold mt-6 mb-4">Excel Data</h3>
+            <h3 className="text-xl font-semibold mt-6 mb-4">Excel/CSV Data</h3>
 
             {/* Loader: Visible when loading is true */}
             {loading && (
