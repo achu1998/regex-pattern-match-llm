@@ -12,6 +12,7 @@ Ensure that you have the following installed:
 - **Based on the LLM you are using -** 
 
     ```bash
+     pip install ollama
      ollama pull mistral
      ```
 **Note**: I'm using `mistral` for **regex generation** and **verification** `google/flan-t5-large` for finding the **replacement word**.
@@ -30,13 +31,19 @@ Follow these steps to set up the project:
     cd regex-pattern-match-llm
     ```
 
-3. **Install Python dependencies**:
+3. **Create virtual environment**:
+    ```bash
+    pip install pipenv
+    pipenv shell
+    ```
+
+4. **Install Python dependencies**:
     Ensure you're in the root directory of the project, then run:
     ```bash
     pip install -r requirements.txt
     ```
 
-4. **Open two terminals**:
+5. **Open two terminals**:
 
    - In the **first terminal**, navigate to the `backend` directory and run the Django backend server:
      ```bash
