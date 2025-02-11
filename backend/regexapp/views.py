@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from transformers import pipeline
 import ollama
 import re
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -56,8 +57,21 @@ def upload_excel(request):
 
     # Delete the uploaded file after processing to free up storage
     default_storage.delete(file_path)
+    
     # Return the processed data as JSON response
-    return JsonResponse({'data': data_store})
+    
+    # Pagination logic
+    page = int(request.GET.get('page', 1))  # Default to page 1
+    page_size = int(request.GET.get('page_size', 10))  # Default 10 records per page
+
+    paginator = Paginator(data_store, page_size)
+    paginated_data = paginator.get_page(page)
+
+    return JsonResponse({
+        'data': list(paginated_data),
+        'total_pages': paginator.num_pages,
+        'current_page': page
+    })
     
 @csrf_exempt
 def generate_regex(request):
@@ -148,10 +162,10 @@ def generate_regex_from_desc(description, model="mistral"):
     print("Waiting for Regex Response...")
     
     prompt = (
-        f"I want you to act as a regex generator. Your role is to convert the following natural language query to a regular expression with valid word boundary on both ends '\b <your_regex> \b' (regex):{description}"
+        f"I want you to act as a regex generator. Your role is to convert the following natural language query to a regular expression '<your_regex>' (regex):{description}. "
         f"You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves."
         f"Provide only the regex pattern as your response, without any explanation or additional text. Regex should be strictly valid without double backslashes or domain matching issues!"
-        f"Return the response strictly in JSON format as: {{'regex_pattern': '\b<your_regex>\b'}} and no other explanation in the response. Regex should have word boundary on both sides!"
+        f"Return the response strictly in JSON format as: {{'regex_pattern': '<your_regex>'}} and no other explanation in the response."
     )
     
     response = ollama.chat(model=model, messages=[

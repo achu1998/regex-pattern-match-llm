@@ -11,10 +11,13 @@ function App() {
     const [replace, setReplace] = useState("");
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     const handleFileChange = (e) => setFile(e.target.files[0]);
 
-    const uploadFile = async () => {
+    const uploadFile = async (page = 1) => {
         if (!file) {
             console.error("No file selected.");
             return;
@@ -22,6 +25,10 @@ function App() {
     
         const formData = new FormData();
         formData.append("file", file);
+
+        if (typeof page === "object") {
+            page = page.detail;
+        }
     
         try {
             // Reset state before making request
@@ -30,7 +37,7 @@ function App() {
             setIsTextVisible(false);
     
             // Send file to backend
-            const res = await axios.post("http://127.0.0.1:8000/upload/", formData, {
+            const res = await axios.post(`http://127.0.0.1:8000/upload/?page=${page}&page_size=10`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
     
@@ -38,12 +45,16 @@ function App() {
             
             if (typeof(responseData.data) != "undefined") {
                 setData(responseData.data);
+                setCurrentPage(responseData.current_page);
+                setTotalPages(responseData.total_pages);
             } else {
                 try {
                     // Handle possible NaN values safely
                     let fixedJsonString = responseData.replace(/NaN/g, "null");
                     let jsonData = JSON.parse(fixedJsonString);
                     setData(jsonData.data);
+                    setCurrentPage(jsonData.current_page);
+                    setTotalPages(jsonData.total_pages);
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                 }
@@ -109,7 +120,8 @@ function App() {
     function replaceMatchingValues(json, regexString, replacement) {
         try {
             // Ensure regex string has word boundaries and is global
-            const regex = new RegExp(`\\b${regexString}\\b`, "g");
+            // const regex = new RegExp(`\\b${regexString}\\b`, "g");
+            const regex = new RegExp(regexString, "g");
     
             function traverse(obj) {
                 if (Array.isArray(obj)) {
@@ -118,7 +130,8 @@ function App() {
                 } else if (typeof obj === "object" && obj !== null) {
                     for (let key in obj) {
                         if (typeof obj[key] === "string" && regex.test(obj[key])) {
-                            obj[key] = replacement;
+                            // obj[key] = replacement;
+                            obj[key] = obj[key].replace(regex, replacement);
                         } else if (typeof obj[key] === "object") {
                             obj[key] = traverse(obj[key]); // Recursively traverse nested objects
                         }
@@ -138,7 +151,7 @@ function App() {
     
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="p-6 mx-auto">
             <h2 className="text-2xl font-semibold mb-4">Upload Excel File</h2>
             <div className="mb-4">
                 <input 
@@ -210,6 +223,24 @@ function App() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+            {/* Pagination Controls */}
+            <div className="mt-4 flex justify-between">
+                <button
+                    onClick={() => uploadFile(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <span className="text-lg">Page {currentPage} of {totalPages}</span>
+                <button
+                    onClick={() => uploadFile(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 disabled:opacity-50"
+                >
+                    Next
+                </button>
             </div>
         </div>
     );
