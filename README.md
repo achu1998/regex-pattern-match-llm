@@ -48,7 +48,7 @@ Follow these steps to set up the project:
    - In the **first terminal**, navigate to the `backend` directory and run the Django backend server:
      ```bash
      cd backend
-     python manage.py runserver
+     python3 manage.py runserver
      ```
 
    - In the **second terminal**, navigate to the `frontend` directory and start the React frontend:
