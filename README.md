@@ -1,4 +1,4 @@
-# Web Application for Regex Pattern Matching and Replacement
+# Web Application for Regex Pattern Matching and Replacement Using LLM
 
 This project allows users to upload Excel or CSV files, generate regex patterns based on user instructions, and replace matched values with specified replacements. The system is built with a **Django** backend and a **React** frontend, providing an intuitive interface for pattern matching and replacement tasks.
 
