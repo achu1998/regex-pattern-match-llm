@@ -111,3 +111,7 @@ Watch the demo of the application:
 - If you encounter any issues, ensure both the backend and frontend servers are running correctly.
 - Make sure the uploaded file is in a valid Excel or CSV format.
 - Check the browser’s developer console for any errors or missing dependencies.
+
+------------------------------------------------------------------------
+
+Developed by Ashween R
