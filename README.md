@@ -1,4 +1,46 @@
-# Web Application for Regex Pattern Matching and Replacement Using LLM
+<!-- portfolio:start -->
+<div align="center">
+
+<img src="docs/images/banner.svg" alt="Natural-Language Regex Replace" width="100%" />
+
+# Natural-Language Regex Replace
+
+**Describe a find-and-replace in plain English; a local LLM writes the regular expression**
+
+![LLM Apps](https://img.shields.io/badge/LLM%20Apps-2025-6366f1?style=flat-square) [![Portfolio](https://img.shields.io/badge/Portfolio-ashween.space-0ea5e9?style=flat-square)](https://ashween.space/projects/regex-pattern-llm)
+
+</div>
+
+## About
+
+Upload a CSV or Excel file, describe the change in plain English, and preview highlighted edits before applying. Mistral generates the regular expression (regex) and Flan-T5 extracts and verifies the replacement values.
+
+Created a full-stack web application with a Django back end and React front end that lets users upload Excel or CSV files and perform data replacement tasks through a simple interface.
+
+Integrated local Large Language Models (LLMs) through Ollama, using Mistral to translate natural-language instructions into precise regular expression (regex) patterns, and google/flan-t5-large to extract and verify the target replacement values.
+
+Developed an interactive preview that shows the generated regex and highlights the resulting changes in a table before the user confirms the replacement.
+
+| | |
+|---|---|
+| **Project** | Web Application for Regex Pattern Matching and Replacement Using LLMs |
+| **Project type** | Full-Stack LLM Application |
+
+## Demo
+
+<p align="center"><a href="https://www.youtube.com/watch?v=wyuaafh-47E"><img src="https://img.youtube.com/vi/wyuaafh-47E/hqdefault.jpg" alt="Regex pattern matching demo" width="70%" /></a><br/><sub>▶ Regex pattern matching demo (YouTube)</sub></p>
+
+## Tech stack
+
+`Python` · `Django` · `React` · `Node.js` · `Ollama` · `Mistral` · `Flan-T5`
+
+> Full write-up on the portfolio: **[ashween.space/projects/regex-pattern-llm](https://ashween.space/projects/regex-pattern-llm)**
+
+<!-- portfolio:end -->
+
+---
+
+## Overview
 
 This project allows users to upload Excel or CSV files, generate regex patterns (using LLM) based on user instructions, and replace matched values with specified replacements. The system is built with a **Django** backend and a **React** frontend, providing an intuitive interface for pattern matching and replacement tasks.
 
