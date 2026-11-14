@@ -90,8 +90,10 @@ Follow these steps to set up the project:
    - In the **first terminal**, navigate to the `backend` directory and run the Django backend server:
      ```bash
      cd backend
+     python3 manage.py migrate   # first run only: creates the local db.sqlite3
      python3 manage.py runserver
      ```
+     Optional: set `DJANGO_SECRET_KEY` in your environment. Without it, a random key is generated on each start.
 
    - In the **second terminal**, navigate to the `frontend` directory and start the React frontend:
      ```bash
